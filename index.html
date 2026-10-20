@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DomainEnglish｜ロボットに えいごで おねがいしよう</title>
+<meta name="description" content="AIへの指示に使う英語を、ゲーム感覚で学べる無料の体験版">
+<meta name="theme-color" content="#2f6bff">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<style>
+:root{--bg:#dff3ff;--card:#fff;--ink:#1d2b4f;--sub:#5d6c8f;--main:#ff7a2f;--blue:#2f6bff;--ok:#12a36b;--ng:#e5484d;--line:#c9dcef;--sun:#ffd84a}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:17px/1.7 "Hiragino Maru Gothic ProN","Hiragino Sans",sans-serif}
+header{max-width:640px;margin:0 auto;padding:16px 16px 4px;display:flex;justify-content:space-between;align-items:center;gap:8px}
+h1{margin:0;font-size:21px}
+.lv{background:var(--card);border:2px solid var(--line);border-radius:20px;padding:2px 12px;font-size:14px;white-space:nowrap}
+nav{max-width:640px;margin:6px auto;padding:0 16px;display:flex;gap:8px}
+nav button{flex:1;padding:10px;border:2px solid var(--line);background:var(--card);color:var(--ink);border-radius:14px;font:inherit;font-size:15px;cursor:pointer}
+nav button.on{background:var(--blue);border-color:var(--blue);color:#fff}
+main{max-width:640px;margin:0 auto;padding:8px 16px 48px}
+.card{background:var(--card);border:2px solid var(--line);border-radius:18px;padding:16px;margin-bottom:12px}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.mis{background:var(--card);border:2px solid var(--line);border-radius:16px;padding:10px 4px;text-align:center;cursor:pointer;font:inherit;color:var(--ink)}
+.mis .e{font-size:32px;display:block}.mis .s{font-size:14px;letter-spacing:2px;color:#e0a800}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.bot{display:flex;gap:10px;align-items:flex-start;margin-bottom:12px}
+.face{font-size:44px;line-height:1}
+.bub{background:var(--card);border:2px solid var(--line);border-radius:6px 18px 18px 18px;padding:10px 14px;flex:1}
+.bub.ok{border-color:var(--ok);background:#e8fbf2}.bub.ng{border-color:var(--ng);background:#fff0f0}
+.chat{min-height:58px;border:3px solid var(--blue);border-radius:16px;background:#fff;padding:8px 12px;font:600 19px/1.9 Georgia,serif;margin-bottom:10px}
+.chat i{color:#a5b4d0;font:15px "Hiragino Sans",sans-serif;font-style:normal}
+button.b{font:inherit;cursor:pointer;border-radius:14px;border:2px solid var(--line);background:var(--card);color:var(--ink);padding:10px 16px}
+button.p{background:var(--main);border-color:var(--main);color:#fff;font-weight:700}
+button:disabled{opacity:.45;cursor:default}
+button:focus-visible{outline:4px solid var(--sun);outline-offset:2px}
+.tile{font:600 18px Georgia,serif;padding:6px 12px;line-height:1.3;box-shadow:0 3px 0 var(--line)}
+.tile small{display:block;font:11px "Hiragino Sans",sans-serif;color:var(--sub)}
+.opt{display:block;width:100%;text-align:left;margin-bottom:8px}
+.opt.ok{border-color:var(--ok);background:#e8fbf2}.opt.ng{border-color:var(--ng);background:#fff0f0}
+.big{font:600 20px Georgia,serif}
+.note{font-size:14px;color:var(--sub);margin-top:6px}
+.stars{font-size:30px;letter-spacing:4px}
+.pop{animation:pop .4s}@keyframes pop{0%{transform:scale(.6)}60%{transform:scale(1.2)}100%{transform:scale(1)}}
+@media (prefers-reduced-motion:reduce){.pop{animation:none}}
+.tg{font-size:14px;color:var(--sub);display:flex;gap:6px;align-items:center;margin-bottom:8px}
+nav button{font-size:13px;padding:9px 2px}
+textarea:focus-visible{outline:4px solid var(--sun)}
+</style>
+</head>
+<body>
+<header><h1>🤖 DomainEnglish</h1><div class="lv" id="lv"></div></header>
+<nav id="nav"></nav>
+<main id="app"></main>
+<script>
+// m(絵, ロボットへのおねがい, "英語:意味 ...", "ダミー英語:意味 ...", ロボットの返事, 解説)
+const fin=s=>/\.$/.test(s)?s:s+".";
+const m=(e,j,w,x,r,n)=>({e,j,w:w.split(" ").map(s=>s.split(":")),x:x.split(" ").map(s=>s.split(":")),r,n,en:fin(w.split(" ").map(s=>s.split(":")[0]).join(" "))});
+const M=[
+m("📧","おばあちゃんに、みじかいメールを 書いてもらおう！","Please:おねがい write:書く a:ひとつの short:みじかい email:メール","long:ながい read:読む","📧「おばあちゃん、元気？ 夏休みに 遊びに行くね！」","Please を つけると ていねいな おねがいに なるよ。short は「みじかい」。"),
+m("📖","ながい文を、みじかく まとめてもらおう！","Summarize:まとめる this:この text:文章","Translate:翻訳する long:ながい","📖 ながい お話 → たった 3行に ギュッ！","AIには、はじめに「〜して」という言葉（動詞）を 置くと 伝わりやすいよ。"),
+m("🧒","むずかしい説明を、やさしく してもらおう！","Explain:説明する it:それ in:〜で simple:かんたんな words:言葉","hard:かたい long:ながい","🧒「でんきは、小さな つぶが 走って 生まれるんだよ」","in simple words =「やさしい 言葉で」。わからない時に とても べんり！"),
+m("🌍","日本語の文を、英語に してもらおう！","Translate:翻訳する this:これ into:〜へ English:英語","from:〜から Japanese:日本語","🌍 ありがとう → Thank you","translate A into B =「A を B に 翻訳する」。into の あとに 言語が 入るよ。"),
+m("🍓","くだものの れいを 3つ 出してもらおう！","Give:あげる me:わたしに three:3つの examples:れい","two:2つの you:あなた","🍓 apple、strawberry、banana！","give me 〜 =「わたしに 〜を ちょうだい」。three の あとは examples と s が つくよ。"),
+m("✂️","返事が 長すぎた！ もっと みじかく してもらおう！","Make:〜にする it:それ shorter:もっとみじかい","longer:もっとながい big:大きい","✂️ 「はい、OKです！」（みじかくなった！）","make it 〜 =「それを 〜に して」。shorter は short の「もっと〜」の形。"),
+m("🎩","ていねいな 話し方で 答えてもらおう！","Use:つかう a:ひとつの polite:ていねいな tone:口調","rude:らんぼうな fast:はやい","🎩「かしこまりました。お手伝いいたします。」","tone は「話し方の ふんいき」。polite を friendly（親しみやすい）に かえても おもしろいよ。"),
+m("🚫","むずかしい言葉を つかわないで もらおう！","Do:する not:〜ない use:つかう difficult:むずかしい words:言葉","easy:かんたんな can:できる","🚫 むずかしい言葉は ぜんぶ やさしく なったよ！","Do not 〜 =「〜しないで」。「やめてほしいこと」を 伝える 大事な 形だよ。"),
+m("🙋","「英語は はじめたばかり」と AI に 伝えよう！","I:わたしは am:〜です a:ひとつの beginner:初心者","you:あなた are:〜です","🙋「OK！ やさしい 英語で 話すね」","I am 〜 =「わたしは 〜です」。自分のことを AI に 教えると 答えが ぴったりに なるよ。"),
+m("🗾","日本語で 答えてもらおう！","Answer:答える in:〜で Japanese:日本語","English:英語 on:〜の上","🗾「はい、日本語で お答えします！」","in Japanese =「日本語で」。in English なら「英語で」。いれかえて つかえるよ。"),
+m("💡","アイデアを 5つ、リストで 出してもらおう！","Write:書く a:ひとつの list:リスト of:〜の five:5つの ideas:アイデア","ten:10の idea:アイデア","💡 1. 公園で ピクニック　2. 星を 見る　3. 絵を かく …","a list of 〜 =「〜の リスト」。five の あとは ideas と s を つけるよ。"),
+m("✏️","自分の 英語を チェックしてもらおう！","Check:たしかめる my:わたしの English:英語","your:あなたの Japanese:日本語","✏️「とても いいよ！ 小さな まちがいが 1つ あったよ」","check my English =「わたしの 英語を たしかめて」。先生ごっこに ぴったりの 一言！"),
+m("🌟","AIに「まとめて、やさしく」を いっぺんに おねがいしよう！（2つの おねがい）","Please:おねがい summarize:まとめる this:この text.:文章 Use:つかう simple:かんたんな words.:言葉","long:ながい Translate:翻訳する","🌟 ながい 文章が、やさしい 言葉の みじかい まとめに なったよ！","2つの おねがいを 1つずつ 文に して つなげると、AIは そのとおりに 動いてくれるよ。"),
+m("🎓","「やさしい 言葉で 説明して、日本語で 答えて」と 伝えよう！","Explain:説明する it:それ in:〜で simple:かんたんな words.:言葉 Answer:答える in:〜で Japanese.:日本語","English.:英語 hard:かたい","🎓「雲は、小さな 水の つぶが あつまった ものだよ」","文を 1つずつ 区切ると、おねがいが はっきり するよ。"),
+m("🐾","「どうぶつ」について、アイデアを 3つ もらおう！（話題つき）","I:わたしは am:〜です a:ひとつの beginner.:初心者 Write:書く three:3つの ideas:アイデア about:〜について animals.:どうぶつ Use:つかう simple:かんたんな words.:言葉","ten:10の plants.:しょくぶつ","🐾 1. どうぶつ園の 一日　2. ねこの ひみつ　3. 海の いきもの","about のあとに「話題」を 入れると、AIは 何について 答えれば いいか わかるよ。自分の レベルも 伝えると 答えが ぴったりに！")
+];
+const $=s=>document.querySelector(s);
+const sh=a=>{a=[...a];for(let i=a.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[a[i],a[j]]=[a[j],a[i]]}return a};
+let S={stars:{},quiz:0,w:{},miss:{},chk:0,vote:{},memo:""};
+try{const r=JSON.parse(localStorage.getItem("domainenglish2")||"null");if(r)S=Object.assign(S,r)}catch(e){}
+const save=()=>{try{localStorage.setItem("domainenglish2",JSON.stringify(S))}catch(e){}};
+const pts=()=>Object.values(S.stars).reduce((a,b)=>a+b,0)+S.quiz+S.chk+Object.values(S.w).reduce((a,b)=>a+b.l,0);
+const LV=[[0,"ひよこ"],[10,"みならい"],[24,"プロンプト名人"],[45,"AIマスター"],[70,"えいご博士"]];
+const level=()=>LV.filter(l=>pts()>=l[0]).pop()[1];
+let tab="words",cur=null,picked,pool,mist,hint=true,Q,qi,score,locked;
+
+function head(){$("#lv").textContent=`⭐ ${pts()}　${level()}`;
+ $("#nav").innerHTML=[["words","たんご"],["map","ミッション"],["quiz","クイズ"],["check","AIチェック"],["log","きろく"]].map(t=>`<button class="${t[0]===tab?"on":""}" onclick="go('${t[0]}')">${t[1]}</button>`).join("")}
+function go(t){tab=t;cur=null;ws=null;if(t==="quiz"){Q=sh(M).slice(0,8);qi=0;score=0}render()}
+function render(){head();({words:rWords,quiz:rQuiz,check:rCheck,log:rLog}[tab]||(cur===null?rMap:rMission))()}
+
+function rMap(){
+ $("#app").innerHTML=`<div class="card">ロボットに 英語で おねがいして、じゅんばんに ミッションを クリアしよう！ ミスが 少ないほど ⭐が ふえるよ。</div><div class="grid">`+
+ M.map((x,i)=>{const s=S.stars[i]||0;return `<button class="mis" onclick="start(${i})"><span class="e">${x.e}</span>ミッション${i+1}<span class="s" style="display:block">${"★".repeat(s)+"☆".repeat(3-s)}</span></button>`}).join("")+`</div>
+ <p class="note">きろくは このブラウザの中に だけ ほぞんされます。<button class="b" style="padding:2px 10px;font-size:13px" onclick="if(confirm('きろくを ぜんぶ けしますか？')){S=def();save();render()}">リセット</button></p>`;
+}
+function start(i){cur=i;picked=[];mist=0;pool=sh([...M[i].w,...M[i].x].map((w,k)=>({w,k})));render()}
+
+function rMission(){
+ const x=M[cur];
+ $("#app").innerHTML=`<div class="bot"><div class="face">🤖</div><div class="bub" id="bub">${x.e} ${x.j}<br><span class="note">下の ことばを ならべて、ロボットに 英語で おねがいしてね。</span></div></div>
+ <div class="chat" id="chat" aria-label="あなたの おねがい"></div>
+ <div class="tg"><label><input type="checkbox" id="hint" ${hint?"checked":""}> ことばの いみを 見る</label></div>
+ <div class="row" id="pool" style="margin-bottom:14px"></div>
+ <div class="row"><button class="b p" id="send">ロボットに おくる 🚀</button><button class="b" id="clr">やりなおし</button><button class="b" onclick="go('map')">もどる</button></div><div id="fb"></div>`;
+ $("#hint").onchange=e=>{hint=e.target.checked;draw()};
+ $("#clr").onclick=()=>{picked=[];pool=sh([...M[cur].w,...M[cur].x].map((w,k)=>({w,k})));draw()};
+ $("#send").onclick=send;draw();
+}
+function draw(){
+ {const j=picked.map(p=>p.w[0]).join(" ");$("#chat").innerHTML=picked.length?(picked.length>=M[cur].w.length?fin(j):j):"<i>ここに ことばが ならぶよ</i>"}
+ const t=(p,from)=>`<button class="b tile" data-k="${p.k}" data-f="${from}">${p.w[0]}${hint?`<small>${p.w[1]}</small>`:""}</button>`;
+ $("#pool").innerHTML=pool.map(p=>t(p,"pool")).join("");
+ $("#chat").onclick=()=>{if(picked.length&&!locked){pool.push(picked.pop());draw()}};
+ $("#pool").querySelectorAll("button").forEach(b=>b.onclick=()=>{if(locked)return;const k=pool.findIndex(p=>p.k==b.dataset.k);picked.push(...pool.splice(k,1));draw()});
+}
+function send(){
+ const x=M[cur];if(!picked.length)return;
+ const mine=fin(picked.map(p=>p.w[0]).join(" "));
+ const bub=$("#bub");
+ if(mine===x.en){
+  const s=mist===0?3:mist===1?2:1;if(s>(S.stars[cur]||0))S.stars[cur]=s;save();head();
+  bub.className="bub ok pop";bub.innerHTML=`${x.r}`;
+  $("#send").disabled=true;
+  $("#fb").innerHTML=`<div class="card" style="margin-top:12px"><div class="stars">${"⭐".repeat(s)}</div><div class="big">${x.en} <button class="b" style="padding:2px 10px" onclick="say('${x.en}')">🔊</button></div><div class="note">${x.n}</div><div class="row" style="margin-top:10px">${cur<M.length-1?`<button class="b p" onclick="start(${cur+1})">つぎの ミッション</button>`:""}<button class="b" onclick="go('map')">ミッション一覧</button></div></div>`;
+ }else{
+  mist++;miss("m"+(cur+1));bub.className="bub ng";
+  bub.innerHTML=`？？？ ごめん、よくわからないよ…。ことばの じゅんばんや えらんだ ことばを もう一度 見てみてね。${mist>=2?`<br>💡 ヒント：さいしょの ことばは「${x.w[0][0]}」だよ。`:""}`;
+ }
+}
+
+function rQuiz(){
+ const app=$("#app");locked=false;
+ if(qi>=Q.length){app.innerHTML=`<div class="card"><div class="stars">${"⭐".repeat(score>=7?3:score>=4?2:1)}</div><div class="big">${Q.length}問中 ${score}問 せいかい！</div><div class="row" style="margin-top:10px"><button class="b p" onclick="go('quiz')">もう一回</button></div></div>`;return}
+ const x=Q[qi],opts=sh([x,...sh(M.filter(y=>y!==x)).slice(0,2)]);
+ app.innerHTML=`<div class="card"><div class="note">${qi+1} / ${Q.length}　この おねがいを うけとった ロボットは どうなる？</div><div class="big">🗣 ${x.en}</div></div>`+
+ opts.map((o,i)=>`<button class="b opt" data-i="${i}">${o.r}</button>`).join("")+`<div id="fb"></div>`;
+ app.querySelectorAll(".opt").forEach((b,i)=>b.onclick=()=>{if(locked)return;locked=true;const ok=opts[i]===x;b.classList.add(ok?"ok":"ng");if(!ok)[...app.querySelectorAll(".opt")][opts.indexOf(x)].classList.add("ok");
+  if(ok){score++;S.quiz++;save();head()}else miss("q"+(M.indexOf(x)+1))
+  $("#fb").innerHTML=`<div class="card"><b>${ok?"せいかい！ 🎉":"ざんねん！"}</b><div>いみ：${x.j}</div><div class="note">${x.n}</div><button class="b p" style="margin-top:8px" onclick="qi++;rQuiz()">${qi+1>=Q.length?"けっかを 見る":"つぎへ"}</button></div>`});
+}
+const def=()=>({stars:{},quiz:0,w:{},miss:{},chk:0,vote:{},memo:""});
+const miss=k=>{S.miss[k]=(S.miss[k]||0)+1;save()};
+const say=t=>{try{const u=new SpeechSynthesisUtterance(t);u.lang="en-US";u.rate=.85;speechSynthesis.cancel();speechSynthesis.speak(u)}catch(e){}};
+// [絵, 英語, 日本語, よみ（★=もう知ってるカタカナ語）]
+const W=[["✍️","write","書く","ライト"],["📖","read","読む","リード"],["🧑‍🏫","explain","説明する","イクスプレイン"],["📝","summarize","まとめる","サマライズ"],["🌍","translate","翻訳する","トランスレイト"],["✅","check","たしかめる","★チェック"],["🔨","make","つくる","★メイク"],["🎁","give","あげる","ギブ"],["🔧","use","つかう","ユーズ"],["💬","answer","答える","アンサー"],["✂️","short","みじかい","★ショート"],["📏","long","ながい","ロング"],["🧩","simple","かんたんな","★シンプル"],["🧗","difficult","むずかしい","ディフィカルト"],["🎩","polite","ていねいな","ポライト"],["📋","list","リスト","★リスト"],["💡","example","れい","イグザンプル"],["🌟","idea","アイデア","★アイデア"],["📧","email","メール","★イーメール"],["📄","text","文章","★テキスト"],["🔤","word","言葉","ワード"],["🎵","tone","口調","★トーン"],["🇬🇧","English","英語","イングリッシュ"],["🗾","Japanese","日本語","ジャパニーズ"],["🔰","beginner","初心者","★ビギナー"],["3️⃣","three","3つ","スリー"],["5️⃣","five","5つ","ファイブ"],["👉","about","〜について","アバウト"],["🙏","please","おねがいします","★プリーズ"],["🚫","not","〜ない","ノット"],["🗂️","topic","話題","★トピック"],["📚","story","お話","★ストーリー"],["❓","question","質問","★クエスチョン"],["📊","table","表","★テーブル"],["🖼️","picture","絵・画像","★ピクチャー"],["🪜","step","だんかい","★ステップ"],["🤝","help","手伝う","★ヘルプ"],["🎯","goal","もくひょう","★ゴール"]];
+let ws=null;
+function rWords(){ws?rWS():rGarden()}
+function rGarden(){
+ const now=Date.now();
+ $("#app").innerHTML=`<div class="card">🌱 たんごを おぼえると 畑で そだつよ。まずは「今日の 5語」から！<div class="row" style="margin-top:10px"><button class="b p" onclick="wStart()">今日の 5語に ちょうせん</button></div></div><div class="card" id="winfo" style="text-align:center">下の カードを タップすると 声が 出るよ 🔊</div><div class="grid" style="grid-template-columns:repeat(4,1fr)">`+
+ W.map((w,i)=>{const s=S.w[w[1]]||{l:0,t:0},dry=s.l>0&&now-s.t>2*864e5;return `<button class="mis" onclick="wTap(${i})"><span class="e">${w[0]}</span><span style="font-size:13px">${w[1]}</span><span>${["🌰","🌱","🌿","🌸"][s.l]}${dry?"💧":""}</span></button>`}).join("")+`</div><p class="note">🌰たね → 🌱め → 🌿はっぱ → 🌸はな。💧は 水やり（ふくしゅう）の サイン。</p>`;
+}
+function wTap(i){const w=W[i];say(w[1]);$("#winfo").innerHTML=`<span style="font-size:40px">${w[0]}</span> <span class="big">${w[1]}</span> ＝ ${w[2]}<div class="note">${w[3][0]==="★"?"★ もう知ってる！ カタカナ："+w[3].slice(1):"よみ："+w[3]}</div>`}
+function wStart(){
+ const lv=w=>(S.w[w[1]]||{l:0}).l;
+ const list=sh(W).sort((a,b)=>lv(a)-lv(b)).slice(0,5);
+ ws={list,ph:"card",i:0,qs:sh(list.flatMap(w=>[{w,t:"pic"},{w,t:"snd"}])),sc:0};render();
+}
+function wNext(){ws.i++;if(ws.i>=5){ws.ph="q";ws.i=0}render()}
+function rWS(){
+ const app=$("#app"),L=ws.list;locked=false;
+ if(ws.ph==="card"){const w=L[ws.i];
+  app.innerHTML=`<div class="card" style="text-align:center"><div class="note">おぼえよう ${ws.i+1} / 5</div><div style="font-size:72px">${w[0]}</div><div class="big" style="font-size:32px">${w[1]}</div><div>${w[2]}</div><div class="note">${w[3][0]==="★"?"★ もう知ってる！ カタカナ："+w[3].slice(1):"よみ："+w[3]}</div><div class="row" style="justify-content:center;margin-top:10px"><button class="b" onclick="say('${w[1]}')">🔊 きく</button><button class="b p" onclick="wNext()">${ws.i<4?"つぎへ":"クイズへ"}</button></div></div>`;say(w[1]);return}
+ if(ws.i>=ws.qs.length){app.innerHTML=`<div class="card" style="text-align:center"><div class="stars">${"⭐".repeat(ws.sc>=9?3:ws.sc>=6?2:1)}</div><div class="big">${ws.qs.length}問中 ${ws.sc}問 せいかい！</div><p class="note">せいかいした たんごは 畑で そだったよ 🌱</p><div class="row" style="justify-content:center"><button class="b p" onclick="ws=null;render()">畑を 見る</button><button class="b" onclick="wStart()">もう一回</button></div></div>`;return}
+ const q=ws.qs[ws.i],w=q.w,pic=q.t==="pic",opts=sh([w,...sh(W.filter(x=>x!==w)).slice(0,3)]);
+ app.innerHTML=`<div class="bar"><i style="width:${ws.i/ws.qs.length*100}%"></i></div><div class="card" style="text-align:center"><div class="note">${ws.i+1} / ${ws.qs.length}　${pic?"えいごは どれ？":"きこえた ことばの いみは？"}</div>${pic?`<div style="font-size:56px">${w[0]}</div><div class="big">${w[2]}</div>`:`<button class="b p" onclick="say('${w[1]}')">🔊 もういちど きく</button>`}</div>`+opts.map((o,i)=>`<button class="b opt" data-i="${i}">${pic?o[1]:o[2]}</button>`).join("")+`<div id="fb"></div>`;
+ if(!pic)say(w[1]);
+ app.querySelectorAll(".opt").forEach((b,i)=>b.onclick=()=>{if(locked)return;locked=true;const ok=opts[i]===w;b.classList.add(ok?"ok":"ng");if(!ok)[...app.querySelectorAll(".opt")][opts.indexOf(w)].classList.add("ok");
+  const s=S.w[w[1]]||{l:0,t:0};if(ok){ws.sc++;s.l=Math.min(3,s.l+1)}else miss("w:"+w[1]);s.t=Date.now();S.w[w[1]]=s;save();head();
+  $("#fb").innerHTML=`<div class="card"><b>${ok?"せいかい！ 🎉":"ざんねん！"}</b> ${w[0]} ${w[1]} ＝ ${w[2]}<div><button class="b p" style="margin-top:8px" onclick="ws.i++;render()">つぎへ</button></div></div>`});
+}
+// AIチェック
+const CK=[["「日本の 首都は？」","「大阪です。」",0,"AIは 自信まんまんで まちがえる ことが あるよ。首都は 東京。"],["「3 + 4 は？」","「7 です。」",1,"あっているね。でも 大事な ことは 自分でも たしかめよう。"],["「今日の 天気は？」","「ぜったいに 晴れです！」",0,"AIは 今日の 天気を 知らない ことが あるよ。「ぜったい」は あやしい サイン。"],["「ふじ山の 高さは？」","「3776 メートルです。」",1,"あっているよ。"],["「名前と 住所を 入れて いい？」","「どうぞ！ 教えてね。」",0,"名前・住所・学校名は AIに 入れないで！ 大人と いっしょに 使おう。"]];
+let ck=0;
+function rCheck(){
+ const c=CK[ck%CK.length];locked=false;
+ $("#app").innerHTML=`<div class="card"><b>🛡 AIと なかよく する 3つの やくそく</b><div class="note">① 名前・住所・学校名は 入れない　② AIの 答えは 本当か たしかめる　③ こまったら 大人に 話す</div></div><div class="card"><div class="note">AIの 答え、しんじて いい？</div><div>🧒 ${c[0]}</div><div class="big">🤖 ${c[1]}</div></div><div class="row"><button class="b p" data-a="1">✅ ほんとう</button><button class="b" data-a="0">🤔 あやしい</button></div><div id="fb"></div>`;
+ document.querySelectorAll("[data-a]").forEach(b=>b.onclick=()=>{if(locked)return;locked=true;const ok=+b.dataset.a===c[2];if(ok){S.chk++;save();head()}else miss("c"+(ck%CK.length+1));
+  $("#fb").innerHTML=`<div class="card" style="margin-top:12px"><b>${ok?"せいかい！ 🎉":"ざんねん！"}</b><div class="note">${c[3]}</div><button class="b p" style="margin-top:8px" onclick="ck++;rCheck()">つぎへ</button></div>`});
+}
+// きろく・フィードバック
+const VOTES=["たんごを もっと ふやす（100語〜）","AIが 英文を 添削","おうちの人への レポート","友だちと 勝負","月額でも 使いたい"];
+const label=k=>k[0]==="m"?"ミッション"+k.slice(1):k[0]==="q"?"クイズ"+k.slice(1):k[0]==="c"?"AIチェック"+k.slice(1):"たんご "+k.slice(2);
+function rep(){
+ const grown=Object.values(S.w).filter(x=>x.l>=3).length,top=Object.entries(S.miss).sort((a,b)=>b[1]-a[1]).slice(0,5).map(e=>label(e[0])+"("+e[1]+"回)").join("、")||"なし";
+ return `DomainEnglish 体験レポート ${new Date().toLocaleDateString("ja-JP")}\n⭐合計:${pts()} / レベル:${level()}\n花まで育った単語:${grown}/${W.length}語\nミッションクリア:${Object.keys(S.stars).length}/${M.length}\nクイズ正解:${S.quiz} / AIチェック正解:${S.chk}\nつまずき:${top}\nほしい機能:${VOTES.filter((v,i)=>S.vote[i]).join("、")||"未選択"}\nメモ:${S.memo||"なし"}`;
+}
+function rLog(){
+ $("#app").innerHTML=`<div class="card"><pre style="white-space:pre-wrap;margin:0;font:14px/1.7 inherit">${rep().replace(/</g,"&lt;")}</pre></div>
+ <div class="card"><b>ほしい 機能に ✓ を つけてね</b>${VOTES.map((v,i)=>`<div class="tg" style="margin:6px 0"><label><input type="checkbox" ${S.vote[i]?"checked":""} onchange="S.vote[${i}]=this.checked;save()"> ${v}</label></div>`).join("")}
+ <b>ひとこと メモ</b><textarea id="memo" rows="3" style="width:100%;font:inherit;border:2px solid var(--line);border-radius:12px;padding:8px;margin-top:6px" placeholder="むずかしかった所、楽しかった所">${S.memo.replace(/</g,"&lt;")}</textarea></div>
+ <div class="row"><button class="b p" id="cp">改善レポートを コピー</button><button class="b" id="rs">きろくを リセット</button></div><p class="note">コピーした レポートを 次の チャットに はりつけると、そこから 改善できます。きろくは この ブラウザの中だけに あります。</p>`;
+ $("#memo").oninput=e=>{S.memo=e.target.value;save()};
+ $("#cp").onclick=()=>{const t=rep();try{navigator.clipboard.writeText(t).then(()=>alert("コピーしました！"),()=>prompt("コピーしてね",t))}catch(e){prompt("コピーしてね",t)}};
+ $("#rs").onclick=()=>{if(confirm("きろくを ぜんぶ けしますか？")){S=def();save();render()}};
+}
+
+render();
+</script>
+</body>
+</html>
